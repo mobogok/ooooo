@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Login / Register</title>
+</head>
+<body>
+    <h2>Login or Create Account</h2>
+    {% if msg %}
+        <p style="color:red;">{{ msg }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <p>Username: <input type="text" name="username" required></p>
+        <p>Password: <input type="password" name="password" required></p>
+        <button type="submit" name="action" value="login">Login</button>
+        <button type="submit" name="action" value="register">Register</button>
+    </form>
+</body>
+</html>
