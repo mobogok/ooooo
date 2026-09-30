@@ -18,15 +18,17 @@ def index():
     if "username" not in session:
         return redirect(url_for("login"))
 
+    username = session["username"]
     user_transactions = []
     total_income = 0.0
     total_expense = 0.0
 
+    # 1. อ่านข้อมูลทั้งหมดเฉพาะของผู้ใช้ปัจจุบัน
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, mode='r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             for row in reader:
-                if row.get("username") == session["username"]:
+                if row.get("username") == username:
                     row["amount"] = float(row["amount"])
                     user_transactions.append(row)
                     if row["type"] == "income":
@@ -36,13 +38,23 @@ def index():
 
     balance = total_income - total_expense
 
+    # 2. รับค่าค้นหาตามวันที่ (GET Parameter)
+    search_date = request.args.get("search_date", "").strip()
+
+    # 3. กรองรายการตามวันที่ที่จะส่งไปแสดงผล
+    display_transactions = []
+    for t in user_transactions:
+        if not search_date or t["date"] == search_date:
+            display_transactions.append(t)
+
     return render_template(
         "index.html",
-        username=session["username"],
-        transactions=user_transactions,
+        username=username,
+        transactions=display_transactions,
         total_income=total_income,
         total_expense=total_expense,
-        balance=balance
+        balance=balance,
+        current_date=search_date
     )
 
 @app.route("/login", methods=["GET", "POST"])
@@ -59,12 +71,13 @@ def login():
             return render_template("login.html", msg="Register success! Please login.")
 
         elif action == "login":
-            with open(USER_FILE, mode='r', encoding='utf-8') as file:
-                reader = csv.DictReader(file)
-                for row in reader:
-                    if row["username"] == username and row["password"] == password:
-                        session["username"] = username
-                        return redirect(url_for("index"))
+            if os.path.exists(USER_FILE):
+                with open(USER_FILE, mode='r', encoding='utf-8') as file:
+                    reader = csv.DictReader(file)
+                    for row in reader:
+                        if row["username"] == username and row["password"] == password:
+                            session["username"] = username
+                            return redirect(url_for("index"))
             return render_template("login.html", msg="Wrong Username or Password!")
 
     return render_template("login.html")
@@ -98,9 +111,36 @@ def add_transaction():
 
     return redirect(url_for("index"))
 
+@app.route("/delete/<int:index>", methods=["POST"])
+def delete_transaction(index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    username = session["username"]
+    all_rows = []
+
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            all_rows = list(reader)
+
+    user_rows = [row for row in all_rows if row.get("username") == username]
+
+    if 0 <= index < len(user_rows):
+        target_item = user_rows[index]
+        all_rows.remove(target_item)
+        
+        with open(DATA_FILE, mode='w', newline='', encoding='utf-8') as file:
+            fieldnames = ["username", "name", "type", "amount", "date"]
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(all_rows)
+
+    return redirect(url_for("index"))
+
 @app.route("/logout")
 def logout():
-    session.clear()
+    session.pop("username", None)
     return redirect(url_for("login"))
 
 if __name__ == "__main__":
