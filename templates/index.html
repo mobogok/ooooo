@@ -38,16 +38,28 @@
     <hr>
 
     <h3>History</h3>
+        <form method="GET" action="/" style="margin-bottom: 15px;">
+        <label>serch by date:</label>
+        <input type="date" name="search_date" value="{{ current_date }}">
+        <button type="submit">serch</button>
+        <a href="/"><button type="button">showall</button></a>
+    </form>
     <ul>
         {% for item in transactions %}
-            <li>
+            <li style="margin-bottom: 8px;">
                 [{{ item.date }}] {{ item.name }}: 
                 {% if item.type == 'income' %}
                     <span style="color:green;">+{{ "%.2f"|format(item.amount) }} bath</span>
                 {% else %}
                     <span style="color:red;">-{{ "%.2f"|format(item.amount) }} bath</span>
                 {% endif %}
+                
+                <form action="/delete/{{ loop.index0 }}" method="POST" style="display:inline; margin-left:10px;">
+                    <button type="submit" onclick="return confirm('confirm deletion?');">Delete</button>
+                </form>
             </li>
+        {% else %}
+        <li>date not found in transaction history</li>
         {% endfor %}
     </ul>
 </body>
