@@ -104,4 +104,5 @@ def logout():
     return redirect(url_for("login"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # ดึงค่า PORT จาก Render ถ้าไม่มีจะใช้ 5000
+    app.run(host="0.0.0.0", port=port, debug=True)
