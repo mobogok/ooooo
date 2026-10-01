@@ -151,6 +151,8 @@ def delete_transaction(index):
                 writer = csv.DictWriter(file, fieldnames=["username", "name", "type", "amount", "date"])
                 writer.writeheader()
                 writer.writerows(rows)
+                
+    return render_template("index.html")
 
 @app.route("/logout")
 def logout():
