@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-import csv
 import os
+import csv
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
@@ -13,6 +13,7 @@ if not os.path.exists(USER_FILE):
         writer = csv.writer(file)
         writer.writerow(["username", "password"])
 
+
 @app.route("/")
 def index():
     if "username" not in session:
@@ -24,10 +25,11 @@ def index():
 
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
+            reader = list(csv.DictReader(file))
+            for idx, row in enumerate(reader):
                 if row.get("username") == session["username"]:
                     row["amount"] = float(row["amount"])
+                    row["original_index"] = idx
                     user_transactions.append(row)
                     if row["type"] == "income":
                         total_income += row["amount"]
@@ -44,6 +46,7 @@ def index():
         total_expense=total_expense,
         balance=balance
     )
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -68,6 +71,7 @@ def login():
             return render_template("login.html", msg="Wrong Username or Password!")
 
     return render_template("login.html")
+
 
 @app.route("/add", methods=["POST"])
 def add_transaction():
@@ -98,11 +102,35 @@ def add_transaction():
 
     return redirect(url_for("index"))
 
+
+@app.route("/delete/<int:index>", methods=["POST"])
+def delete_transaction(index):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    if os.path.exists(DATA_FILE):
+        rows = []
+        with open(DATA_FILE, mode='r', encoding='utf-8') as file:
+            reader = list(csv.DictReader(file))
+            rows = reader
+
+        if 0 <= index < len(rows) and rows[index].get("username") == session["username"]:
+            rows.pop(index) 
+
+            with open(DATA_FILE, mode='w', newline='', encoding='utf-8') as file:
+                writer = csv.DictWriter(file, fieldnames=["username", "name", "type", "amount", "date"])
+                writer.writeheader()
+                writer.writerows(rows)
+
+    return render_template("delete.html")
+
+
 @app.route("/logout")
 def logout():
     session.pop("username", None)
     return redirect(url_for("login"))
 
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # ดึงค่า PORT จาก Render ถ้าไม่มีจะใช้ 5000
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
