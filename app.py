@@ -152,7 +152,7 @@ def delete_transaction(index):
                 writer.writeheader()
                 writer.writerows(rows)
                 
-    return render_template("index.html")
+    return render_template("delete.html")
 
 @app.route("/logout")
 def logout():
