@@ -117,13 +117,6 @@ def add_transaction():
         "date": item_date
     }
 
-    file_exists = os.path.exists(DATA_FILE)
-    with open(DATA_FILE, mode='a', newline='', encoding='utf-8') as file:
-        writer = csv.DictWriter(file, fieldnames=["username", "name", "type", "amount", "date"])
-        if not file_exists:
-            writer.writeheader()
-        writer.writerow(data)
-
     return redirect(url_for("index"))
     if 0 <= index < len(rows) and rows[index].get("username") == session["username"]:
             rows.pop(index)
