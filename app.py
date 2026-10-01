@@ -125,6 +125,15 @@ def add_transaction():
         writer.writerow(data)
 
     return redirect(url_for("index"))
+    if 0 <= index < len(rows) and rows[index].get("username") == session["username"]:
+            rows.pop(index)
+
+            with open(DATA_FILE, mode='w', newline='', encoding='utf-8') as file:
+                writer = csv.DictWriter(file, fieldnames=["username", "name", "type", "amount", "date"])
+                writer.writeheader()
+                writer.writerows(rows)
+
+    return render_template("delete.html")
 
 @app.route("/logout")
 def logout():
