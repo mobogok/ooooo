@@ -152,9 +152,6 @@ def delete_transaction(index):
                 writer.writeheader()
                 writer.writerows(rows)
 
-    return render_template("index.html")
-
-
 @app.route("/logout")
 def logout():
     session.pop("username", None)
