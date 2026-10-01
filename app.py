@@ -18,7 +18,16 @@ if not os.path.exists(USER_FILE):
 def index():
     if "username" not in session:
         return redirect(url_for("login"))
+        
+        search_date = request.args.get("search_date", "").strip()
 
+    formatted_search_date = None
+    if search_date:
+        try:
+            formatted_search_date = datetime.strptime(search_date, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+            
     user_transactions = []
     total_income = 0.0
     total_expense = 0.0
@@ -35,6 +44,9 @@ def index():
                         total_income += row["amount"]
                     else:
                         total_expense += row["amount"]
+                    if formatted_search_date:
+                        raw_date_str = row.get("date", "").strip()
+                        row_date_obj = None
 
     balance = total_income - total_expense
 
