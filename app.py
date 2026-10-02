@@ -32,18 +32,18 @@ def index():
 
     search_date = request.args.get("search_date", "").strip()
 
-start_date = none
-end_date = none
+    start_date = None
+    end_date = None
 
-if serch_date:
-    if"-" in serch_date and len(serch_date.split("-")) == 2:
-        parts = serch_date.split("-")
-        start_date = parse_date(part[0])
-        end_date = parse_date(part[1])
-    else:
-        start_date = parse_date(serch_date)
-        end_date = start_date
-   
+    if search_date:
+        if "-" in search_date and len(search_date.split("-")) == 2:
+            parts = search_date.split("-")
+            start_date = parse_date(parts[0])
+            end_date = parse_date(parts[1])
+        else:
+            start_date = parse_date(search_date)
+            end_date = start_date
+
     user_transactions = []
     total_income = 0.0
     total_expense = 0.0
@@ -62,11 +62,12 @@ if serch_date:
                         total_expense += row["amount"]
 
                     if start_date and end_date:
-                        row_date_obj = parse_date(row.get("date",""))
+                        row_date_obj = parse_date(row.get("date", ""))
                         if row_date_obj and (start_date <= row_date_obj <= end_date):
                             user_transactions.append(row)
                     else:
                         user_transactions.append(row)
+
     balance = total_income - total_expense
 
     return render_template(
@@ -153,8 +154,9 @@ def delete_transaction(index):
                 writer = csv.DictWriter(file, fieldnames=["username", "name", "type", "amount", "date"])
                 writer.writeheader()
                 writer.writerows(rows)
-                
-    return render_template("delete.html")
+
+    return redirect(url_for("index"))
+
 
 @app.route("/logout")
 def logout():
