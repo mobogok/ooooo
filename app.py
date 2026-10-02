@@ -14,6 +14,16 @@ if not os.path.exists(USER_FILE):
         writer = csv.writer(file)
         writer.writerow(["username", "password"])
 
+def parse_date(date_str):
+    """Parses various date string formats into Python date objects."""
+    date_str = date_str.strip()
+    formats = ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d/%m/%y", "%m/%d/%y", "%d-%m-%Y")
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str, fmt).date()
+        except ValueError:
+            continue
+    return None
 
 @app.route("/")
 def index():
@@ -22,13 +32,18 @@ def index():
 
     search_date = request.args.get("search_date", "").strip()
 
-    formatted_search_date = None
-    if search_date:
-        try:
-            formatted_search_date = datetime.strptime(search_date, "%Y-%m-%d").date()
-        except ValueError:
-            pass
+start_date = none
+end_date = none
 
+if serch_date:
+    if"-" in serch_date and len(serch_date.split("-")) == 2:
+        parts = serch_date.split("-")
+        start_date = parse_date(part[0])
+        end_date = parse_date(part[1])
+    else:
+        start_date = parse_date(serch_date)
+        end_date = start_date
+   
     user_transactions = []
     total_income = 0.0
     total_expense = 0.0
@@ -40,31 +55,18 @@ def index():
                 if row.get("username") == session["username"]:
                     row["amount"] = float(row["amount"])
                     row["original_index"] = idx  # Keep track of index in CSV
-                    
-                    # Accumulate totals
+
                     if row["type"] == "income":
                         total_income += row["amount"]
                     else:
                         total_expense += row["amount"]
 
-                    # Filter transactions by date
-                    if formatted_search_date:
-                        raw_date_str = row.get("date", "").strip()
-                        row_date_obj = None
-
-                        # Handle common date formats
-                        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y"):
-                            try:
-                                row_date_obj = datetime.strptime(raw_date_str, fmt).date()
-                                break
-                            except ValueError:
-                                continue
-
-                        if row_date_obj and row_date_obj == formatted_search_date:
+                    if start_date and end_date:
+                        row_date_obj = parse_date(row.get("date",""))
+                        if row_date_obj and (start_date <= row_date_obj <= end_date):
                             user_transactions.append(row)
                     else:
                         user_transactions.append(row)
-
     balance = total_income - total_expense
 
     return render_template(
