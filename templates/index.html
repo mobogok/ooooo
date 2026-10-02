@@ -45,12 +45,12 @@
     <hr>
 
     <h3>History</h3>
-        <form method="GET" action="/" style="margin-bottom: 15px;">
-        <label>serch by date:</label>
-        <input type="date" name="search_date" value="{{ current_date }}">
-        <button type="submit">serch</button>
-        <a href="/"><button type="button">showall</button></a>
-    </form>
+<form method="GET" action="/" style="margin-bottom: 15px;">
+    <label>serch by date:</label>
+    <input type="text" name="search_date" placeholder="YYYY-MM-DD or 1/1/26-7/1/26" value="{{ search_date if search_date else '' }}">
+    <button type="submit">serch</button>
+    <a href="/"><button type="button">showall</button></a>
+</form>
     <ul>
         {% for item in transactions %}
             <li style="margin-bottom: 8px;">
