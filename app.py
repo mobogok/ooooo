@@ -16,8 +16,10 @@ if not os.path.exists(USER_FILE):
 
 def parse_date(date_str):
     """Parses various date string formats into Python date objects."""
+    if not date_str:
+        return None
     date_str = date_str.strip()
-    formats = ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d/%m/%y", "%m/%d/%y", "%d-%m-%Y")
+    formats = ("%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y", "%d/%m/%y", "%m/%d/%y", "%d-%m-%Y")
     for fmt in formats:
         try:
             return datetime.strptime(date_str, fmt).date()
@@ -30,19 +32,11 @@ def index():
     if "username" not in session:
         return redirect(url_for("login"))
 
-    search_date = request.args.get("search_date", "").strip()
+    start_date_str = request.args.get("start_date", "").strip()
+    end_date_str = request.args.get("end_date", "").strip()
 
-    start_date = None
-    end_date = None
-
-    if search_date:
-        if "-" in search_date and len(search_date.split("-")) == 2:
-            parts = search_date.split("-")
-            start_date = parse_date(parts[0])
-            end_date = parse_date(parts[1])
-        else:
-            start_date = parse_date(search_date)
-            end_date = start_date
+    start_date = parse_date(start_date_str)
+    end_date = parse_date(end_date_str)
 
     user_transactions = []
     total_income = 0.0
@@ -61,12 +55,22 @@ def index():
                     else:
                         total_expense += row["amount"]
 
-                    if start_date and end_date:
-                        row_date_obj = parse_date(row.get("date", ""))
-                        if row_date_obj and (start_date <= row_date_obj <= end_date):
+                    row_date_obj = parse_date(row.get("date", ""))
+                    if row_date_obj:
+                        if start_date and end_date:
+                            if start_date <= row_date_obj <= end_date:
+                                user_transactions.append(row)
+                        elif start_date:
+                            if row_date_obj >= start_date:
+                                user_transactions.append(row)
+                        elif end_date:
+                            if row_date_obj <= end_date:
+                                user_transactions.append(row)
+                        else:
                             user_transactions.append(row)
                     else:
-                        user_transactions.append(row)
+                        if not start_date and not end_date:
+                            user_transactions.append(row)
 
     balance = total_income - total_expense
 
@@ -77,7 +81,8 @@ def index():
         total_income=total_income,
         total_expense=total_expense,
         balance=balance,
-        search_date=search_date
+        start_date=start_date_str,
+        end_date=end_date_str
     )
 
 
@@ -113,7 +118,7 @@ def add_transaction():
 
     item_name = request.form.get("name")
     category = request.form.get("category")
-    amount = float(request.form.get("amount"))
+    amount = float(request.form.get("amount", 0))
     item_date = request.form.get("date")
 
     t_type = "income" if category == "1" else "expense"
