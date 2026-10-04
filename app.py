@@ -1,5 +1,6 @@
 import os
 import csv
+import math
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session
 
@@ -84,7 +85,9 @@ def index():
         start_date=start_date_str,
         end_date=end_date_str
     )
-
+    if balance<1000
+        K=input(balance)% 1000
+        print(K)   # test adding K
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
