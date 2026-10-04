@@ -72,8 +72,7 @@ def index():
                     else:
                         if not start_date and not end_date:
                             user_transactions.append(row)
-
-    balance = total_income - total_expense
+    balance = total_income - total_expense ÷ 1000 #test adding K
 
     return render_template(
         "index.html",
@@ -85,9 +84,6 @@ def index():
         start_date=start_date_str,
         end_date=end_date_str
     )
-    if balance<1000
-        K=input(balance)% 1000
-        print(K)   # test adding K
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
