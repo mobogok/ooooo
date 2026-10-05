@@ -85,7 +85,7 @@ def index():
         total_income=total_income,
         total_expense=total_expense,
         balance=balance,
-        k_system=k,
+        k_system=k_system,
         start_date=start_date_str,
         end_date=end_date_str
     )
