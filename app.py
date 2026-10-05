@@ -76,7 +76,7 @@ def index():
 
 #test adding k
     
-    k_system = balance \ 1000
+    k_system = balance / 1000
 
     return render_template(
         "index.html",
