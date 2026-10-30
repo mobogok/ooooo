@@ -42,19 +42,20 @@
     <p>Expense Total: -{{ "%.2f"|format(total_expense) }} bath</p>
     <h3>User {{ username }} has {{ "%.2f"|format(balance) }} bath</h3>
     <p>User {{ username }} has {{ "%.2f"|format(k_system) }} K</p>
-    
+
     <hr>
 
     <h3>History</h3>
     <form method="GET" action="/" style="margin-bottom: 15px;">
         <label>From:</label>
         <input type="date" name="start_date" value="{{ start_date if start_date else '' }}">
-        
+
         <label style="margin-left: 10px;">To:</label>
         <input type="date" name="end_date" value="{{ end_date if end_date else '' }}">
-        
+
         <button type="submit">serch</button>
         <a href="/"><button type="button">showall</button></a>
+        <h4>{{ dept_sys }}</h4>
     </form>
 
     <ul>
@@ -66,7 +67,7 @@
                 {% else %}
                     <span style="color:red;">-{{ "%.2f"|format(item.amount) }} bath</span>
                 {% endif %}
-                
+
                 <form action="/delete/{{ item.original_index }}" method="POST" style="display:inline; margin-left:10px;">
                     <button type="submit" onclick="return confirm('confirm deletion?');">Delete</button>
                 </form>
