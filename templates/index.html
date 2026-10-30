@@ -42,7 +42,7 @@
     <p>Expense Total: -{{ "%.2f"|format(total_expense) }} bath</p>
     <h3>User {{ username }} has {{ "%.2f"|format(balance) }} bath</h3>
     <p>User {{ username }} has {{ "%.2f"|format(k_system) }} K</p>
-
+    <p>{{ username }} dept = {{ dept }}</p>
     <hr>
 
     <h3>History</h3>
@@ -66,7 +66,6 @@
                 {% else %}
                     <span style="color:red;">-{{ "%.2f"|format(item.amount) }} bath</span>
                 {% endif %}
-                <h1>{{ dept }}</h1>
                 <form action="/delete/{{ item.original_index }}" method="POST" style="display:inline; margin-left:10px;">
                     <button type="submit" onclick="return confirm('confirm deletion?');">Delete</button>
                 </form>
