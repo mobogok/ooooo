@@ -55,7 +55,6 @@
 
         <button type="submit">serch</button>
         <a href="/"><button type="button">showall</button></a>
-        <h4>{{ dept_sys }}</h4>
     </form>
 
     <ul>
@@ -67,7 +66,7 @@
                 {% else %}
                     <span style="color:red;">-{{ "%.2f"|format(item.amount) }} bath</span>
                 {% endif %}
-
+                <h1>{{ dept }}</h1>
                 <form action="/delete/{{ item.original_index }}" method="POST" style="display:inline; margin-left:10px;">
                     <button type="submit" onclick="return confirm('confirm deletion?');">Delete</button>
                 </form>
