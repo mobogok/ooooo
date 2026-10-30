@@ -75,9 +75,9 @@ def index():
     balance = total_income - total_expense
 
     if balance < 0 :
-        debt = true
+        debt = "true"
     else:
-        debt = false
+        debt = "false"
 #test adding k
 
     k_system = balance / 1000
