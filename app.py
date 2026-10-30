@@ -74,8 +74,12 @@ def index():
                             user_transactions.append(row)
     balance = total_income - total_expense
 
+    if balance < 0 :
+        debt="true"
+    else:
+        debt="false"
 #test adding k
-    
+
     k_system = balance / 1000
 
     return render_template(
@@ -87,7 +91,8 @@ def index():
         balance=balance,
         k_system=k_system,
         start_date=start_date_str,
-        end_date=end_date_str
+        end_date=end_date_str,
+        debt=debt_sys
     )
 
 #if error delete line 88 and 79
