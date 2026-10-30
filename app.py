@@ -92,7 +92,7 @@ def index():
         k_system=k_system,
         start_date=start_date_str,
         end_date=end_date_str,
-        debt=debt_sys
+        debt=debt
     )
 
 #if error delete line 88 and 79
